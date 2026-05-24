@@ -26,8 +26,8 @@ function App() {
   
       const data = await scanTarget(ip);
   
-      if (data.error) {
-        setError(data.error);
+      if (data.detail) {
+        setError(data.detail);
         return;
       }
   

@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI,HTTPException
 from pydantic import BaseModel
 import socket
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,12 +13,15 @@ app.add_middleware(
 )
 class ScanRequest(BaseModel):
     ip: str
-
+class ScanResponse(BaseModel):
+    target: str
+    resolved_ip: str
+    open_ports: list[int]
 @app.get("/")
 def root():
     return {"message": "Cyber Dashboard API"}
 
-@app.post("/scan")
+@app.post("/scan",response_model=ScanResponse)
 def scan_ports(data: ScanRequest):
     if not data.ip.strip():
         return {
@@ -26,7 +29,17 @@ def scan_ports(data: ScanRequest):
         }
     ports = [21, 22, 80, 443, 3306]
     open_ports = []
-    resolved_ip = socket.gethostbyname(data.ip)
+    try :
+        resolved_ip = socket.gethostbyname(data.ip)
+    except Exception as e:
+
+        print(e)
+
+        raise HTTPException(
+            status_code=400,
+            detail="Impossible de résoudre ce domaine"
+        )
+
     for port in ports:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(0.5)
