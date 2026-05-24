@@ -17,12 +17,22 @@ Application fullstack développée avec React et FastAPI permettant d'effectuer 
 
 ## Fonctionnalités
 
+
 - Scan de ports réseau
-- API REST avec FastAPI
-- Communication frontend/backend
-- Affichage dynamique des résultats
-- Gestion du CORS
+- Résolution DNS
 - Historique des scans
+- API REST avec FastAPI
+- Gestion des erreurs HTTP
+- Validation des données avec Pydantic
+- Interface React avec TailwindCSS
+  
+## API
+
+L'API est développée avec FastAPI et utilise :
+- Pydantic pour la validation des données
+- des modèles de réponse typés
+- des status HTTP adaptés
+- la résolution DNS via le module socket
 
 ## Exemple
 
