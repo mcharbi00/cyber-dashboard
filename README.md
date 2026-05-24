@@ -8,6 +8,7 @@ Application fullstack développée avec React et FastAPI permettant d'effectuer 
 - React
 - Vite
 - JavaScript
+- TailwindCSS
 
 ### Backend
 - FastAPI
@@ -21,6 +22,7 @@ Application fullstack développée avec React et FastAPI permettant d'effectuer 
 - Communication frontend/backend
 - Affichage dynamique des résultats
 - Gestion du CORS
+- Historique des scans
 
 ## Exemple
 
