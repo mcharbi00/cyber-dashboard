@@ -20,10 +20,13 @@ def root():
 
 @app.post("/scan")
 def scan_ports(data: ScanRequest):
-
+    if not data.ip.strip():
+        return {
+            "error": "IP ou domaine invalide"
+        }
     ports = [21, 22, 80, 443, 3306]
     open_ports = []
-
+    resolved_ip = socket.gethostbyname(data.ip)
     for port in ports:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(0.5)
@@ -37,5 +40,6 @@ def scan_ports(data: ScanRequest):
 
     return {
         "ip": data.ip,
+        "resolved_ip": resolved_ip,
         "open_ports": open_ports
     }

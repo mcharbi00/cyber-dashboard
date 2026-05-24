@@ -1,4 +1,4 @@
-function ScanForm({ ip, setIp, scanIP }) {
+function ScanForm({ ip, setIp, scanIP, loading}) {
 
     return (
       <div className="flex gap-2">
@@ -13,7 +13,8 @@ function ScanForm({ ip, setIp, scanIP }) {
   
         <button
           onClick={scanIP}
-          className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-md text-black"
+          disabled={loading}
+          className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-md text-black disabled:opacity-20"
         >
           Scanner
         </button>

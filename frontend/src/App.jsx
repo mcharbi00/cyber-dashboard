@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import PortCard from "./components/PortCard";
 import ScanForm from "./components/ScanForm";
+import { scanTarget } from "./services/api";
 
 function App() {
   const [message, setMessage] = useState("");
   const [ip, setIp] = useState("");
-  const [ports, setPorts] = useState([]);
+  const [scanResult, setScanResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [history, setHistory]= useState([]);
@@ -16,37 +17,40 @@ function App() {
       .then((data) => setMessage(data.message));
   }, []);
   const scanIP = async () => {
-    setPorts([]); //Permet d'effacer les précédents resultats
+
     try {
-    setLoading(true);
-    const response = await fetch("http://127.0.0.1:8000/scan", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ ip }),
-    });
-
   
-    const data = await response.json();
+      setLoading(true);
+      setError("");
+      setScanResult(null);
   
-    setPorts(data.open_ports);
-    setHistory((prev) => [
-      {
-        target: ip,
-        ports: data.open_ports,
-        time: new Date().toLocaleTimeString(),
-      },
-      ...prev, // ... Permet de déplier le tableau
-    ])
-  }
-  catch(err){
-    setError("Erreur pendant le scan");
-
-  }
-  finally{
-    setLoading(false);
-  }
+      const data = await scanTarget(ip);
+  
+      if (data.error) {
+        setError(data.error);
+        return;
+      }
+  
+      setScanResult(data);
+  
+      setHistory((prev) => [
+        {
+          target: ip,
+          ports: data.open_ports,
+          time: new Date().toLocaleTimeString(),
+        },
+        ...prev,
+      ]);
+  
+    } catch (err) {
+  
+      setError("Erreur pendant le scan");
+  
+    } finally {
+  
+      setLoading(false);
+  
+    }
   };
 
 
@@ -64,6 +68,7 @@ function App() {
           ip={ip}
           setIp={setIp}
           scanIP={scanIP}
+          loading={loading}
         />  
   
         {loading && (
@@ -78,14 +83,27 @@ function App() {
           </p>
         )}
   
-        <div className="mt-5 space-y-2">
+  {scanResult && (
 
-          {ports.map((port) => (
-            <PortCard key={port} port={port} />
+<div className="mt-5 space-y-2">
 
-          ))}
-  
-        </div>
+  <div className="bg-zinc-800 border border-zinc-700 rounded-md p-3">
+    IP : {scanResult.resolved_ip}
+  </div>
+
+  {scanResult.open_ports.map((port) => (
+
+    <div
+      key={port}
+      className="bg-zinc-800 border border-zinc-700 rounded-md p-3"
+    >
+      Port {port} ouvert
+    </div>
+
+  ))}
+
+</div>
+)}
         <div className="mt-8">
 
       <h2 className="text-lg mb-3">
