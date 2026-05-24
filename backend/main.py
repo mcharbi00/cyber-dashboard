@@ -14,10 +14,15 @@ app.add_middleware(
 class ScanRequest(BaseModel):
     ip: str
     ports: str
+
+class PortResult(BaseModel):
+    port: int
+    status: str
 class ScanResponse(BaseModel):
     target: str
     resolved_ip: str
-    open_ports: list[int]
+    results: list[PortResult]
+
 @app.get("/")
 def root():
     return {"message": "Cyber Dashboard API"}
@@ -29,7 +34,7 @@ def scan_ports(data: ScanRequest):
         return {
             "error": "IP ou domaine invalide"
         }
-    open_ports = []
+    scan_results = []
     try :
         resolved_ip = socket.gethostbyname(data.ip)
     except Exception as e:
@@ -47,13 +52,15 @@ def scan_ports(data: ScanRequest):
 
         result = sock.connect_ex((data.ip, port))
 
-        if result == 0:
-            open_ports.append(port)
+        scan_results.append({
+            "port": port,
+            "status": "OPEN" if result == 0 else "CLOSED"
+        })
 
         sock.close()
 
     return {
         "target": data.ip,
         "resolved_ip": resolved_ip,
-        "open_ports": open_ports
+        "results": scan_results
     }

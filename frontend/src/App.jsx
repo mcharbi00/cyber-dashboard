@@ -37,7 +37,10 @@ function App() {
       setHistory((prev) => [
         {
           target: ip,
-          ports: data.open_ports,
+          ports: data.results
+          .filter((result) => result.status === "OPEN")
+          .map((result) => result.port),
+
           time: new Date().toLocaleTimeString(),
         },
         ...prev,
@@ -94,14 +97,17 @@ function App() {
     IP : {scanResult.resolved_ip}
   </div>
 
-  {scanResult.open_ports.map((port) => (
-
+  {scanResult.results.map((result) => (
     <div
-      key={port}
-      className="bg-zinc-800 border border-zinc-700 rounded-md p-3"
-    >
-      Port {port} ouvert
-    </div>
+    key={result.port}
+    className={`border rounded-md p-3 ${
+      result.status === "OPEN"
+        ? "bg-green-900 border-green-700"
+        : "bg-red-900 border-red-700"
+    }`}
+  >
+    Port {result.port} → {result.status}
+  </div>
 
   ))}
 
