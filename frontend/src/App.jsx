@@ -102,8 +102,10 @@ function App() {
     key={result.port}
     className={`border rounded-md p-3 ${
       result.status === "OPEN"
-        ? "bg-green-900 border-green-700"
-        : "bg-red-900 border-red-700"
+      ? "bg-green-900 border-green-700"
+      : result.status === "FILTERED"
+      ? "bg-yellow-900 border-yellow-700"
+      : "bg-red-900 border-red-700"
     }`}
   >
     Port {result.port} ({result.service}) → {result.status}

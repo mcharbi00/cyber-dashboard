@@ -57,9 +57,10 @@ def scan_ports(data: ScanRequest):
     for port in ports_to_scan:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # socket .AF_INET -> désigne l'ipv4 // .SOCK_STREAM désigne le protocole TCP
         sock.settimeout(0.5)
-
-        result = sock.connect_ex((data.ip, port))
-
+        try :
+            result = sock.connect_ex((data.ip, port))
+        except socket.timeout :
+            status = "FILTERED"
         scan_results.append({
             "port": port,
             "status": "OPEN" if result == 0 else "CLOSED",
