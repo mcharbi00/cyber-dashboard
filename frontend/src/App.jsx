@@ -106,7 +106,7 @@ function App() {
         : "bg-red-900 border-red-700"
     }`}
   >
-    Port {result.port} → {result.status}
+    Port {result.port} ({result.service}) → {result.status}
   </div>
 
   ))}

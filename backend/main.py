@@ -18,11 +18,19 @@ class ScanRequest(BaseModel):
 class PortResult(BaseModel):
     port: int
     status: str
+    service: str
 class ScanResponse(BaseModel):
     target: str
     resolved_ip: str
     results: list[PortResult]
 
+COMMON_SERVICES = {
+    21: "FTP",
+    22: "SSH",
+    80: "HTTP",
+    443: "HTTPS",
+    3306: "MySQL",
+}
 @app.get("/")
 def root():
     return {"message": "Cyber Dashboard API"}
@@ -54,7 +62,9 @@ def scan_ports(data: ScanRequest):
 
         scan_results.append({
             "port": port,
-            "status": "OPEN" if result == 0 else "CLOSED"
+            "status": "OPEN" if result == 0 else "CLOSED",
+            "service": COMMON_SERVICES.get(port, "Unknown")
+
         })
 
         sock.close()
