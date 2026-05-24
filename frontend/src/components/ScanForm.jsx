@@ -1,4 +1,11 @@
-function ScanForm({ ip, setIp, scanIP, loading}) {
+function ScanForm({
+    ip,
+    setIp,
+    scanIP,
+    loading,
+    portsInput,
+    setPortsInput
+  }) {
 
     return (
       <div className="flex gap-2">
@@ -10,7 +17,13 @@ function ScanForm({ ip, setIp, scanIP, loading}) {
           onChange={(e) => setIp(e.target.value)}
           className="flex-1 bg-zinc-800 border border-zinc-700 rounded-md px-3 py-2 outline-none"
         />
-  
+        <input
+        type="text"
+        placeholder="Ports ex: 80,443,22"
+        value={portsInput}
+        onChange={(e) => setPortsInput(e.target.value)}
+        className="flex-1 bg-zinc-800 border border-zinc-700 rounded-md px-3 py-2 outline-none"
+        />
         <button
           onClick={scanIP}
           disabled={loading}

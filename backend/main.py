@@ -13,6 +13,7 @@ app.add_middleware(
 )
 class ScanRequest(BaseModel):
     ip: str
+    ports: str
 class ScanResponse(BaseModel):
     target: str
     resolved_ip: str
@@ -23,11 +24,11 @@ def root():
 
 @app.post("/scan",response_model=ScanResponse)
 def scan_ports(data: ScanRequest):
+    ports_to_scan = [int(port) for port in data.ports.split(",")]
     if not data.ip.strip():
         return {
             "error": "IP ou domaine invalide"
         }
-    ports = [21, 22, 80, 443, 3306]
     open_ports = []
     try :
         resolved_ip = socket.gethostbyname(data.ip)
@@ -40,8 +41,8 @@ def scan_ports(data: ScanRequest):
             detail="Impossible de résoudre ce domaine"
         )
 
-    for port in ports:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    for port in ports_to_scan:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # socket .AF_INET -> désigne l'ipv4 // .SOCK_STREAM désigne le protocole TCP
         sock.settimeout(0.5)
 
         result = sock.connect_ex((data.ip, port))
@@ -52,7 +53,7 @@ def scan_ports(data: ScanRequest):
         sock.close()
 
     return {
-        "ip": data.ip,
+        "target": data.ip,
         "resolved_ip": resolved_ip,
         "open_ports": open_ports
     }

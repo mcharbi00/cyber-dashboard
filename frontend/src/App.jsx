@@ -10,6 +10,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [history, setHistory]= useState([]);
+  const [portsInput, setPortsInput] = useState("80,443");
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/")
@@ -24,7 +25,7 @@ function App() {
       setError("");
       setScanResult(null);
   
-      const data = await scanTarget(ip);
+      const data = await scanTarget(ip,portsInput);
   
       if (data.detail) {
         setError(data.detail);
@@ -69,7 +70,9 @@ function App() {
           setIp={setIp}
           scanIP={scanIP}
           loading={loading}
-        />  
+          portsInput={portsInput}
+          setPortsInput={setPortsInput}
+        /> 
   
         {loading && (
           <p className="mt-4 text-zinc-400">
