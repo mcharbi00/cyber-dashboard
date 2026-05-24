@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import PortCard from "./components/PortCard";
+import ScanForm from "./components/ScanForm";
 
 function App() {
   const [message, setMessage] = useState("");
@@ -6,6 +8,8 @@ function App() {
   const [ports, setPorts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [history, setHistory]= useState([]);
+
   useEffect(() => {
     fetch("http://127.0.0.1:8000/")
       .then((res) => res.json())
@@ -27,6 +31,14 @@ function App() {
     const data = await response.json();
   
     setPorts(data.open_ports);
+    setHistory((prev) => [
+      {
+        target: ip,
+        ports: data.open_ports,
+        time: new Date().toLocaleTimeString(),
+      },
+      ...prev, // ... Permet de déplier le tableau
+    ])
   }
   catch(err){
     setError("Erreur pendant le scan");
@@ -48,24 +60,11 @@ function App() {
           Cyber Dashboard
         </h1>
   
-        <div className="flex gap-2">
-  
-          <input
-            type="text"
-            placeholder="Adresse IP ou domaine"
-            value={ip}
-            onChange={(e) => setIp(e.target.value)}
-            className="flex-1 bg-zinc-800 border border-zinc-700 rounded-md px-3 py-2 outline-none"
-          />
-  
-          <button
-            onClick={scanIP}
-            className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-md text-black"
-          >
-            Scanner
-          </button>
-  
-        </div>
+        <ScanForm
+          ip={ip}
+          setIp={setIp}
+          scanIP={scanIP}
+        />  
   
         {loading && (
           <p className="mt-4 text-zinc-400">
@@ -80,20 +79,35 @@ function App() {
         )}
   
         <div className="mt-5 space-y-2">
-  
+
           {ports.map((port) => (
-  
-            <div
-              key={port}
-              className="bg-zinc-800 border border-zinc-700 rounded-md p-3"
-            >
-              Port {port} ouvert
-            </div>
-  
+            <PortCard key={port} port={port} />
+
           ))}
   
         </div>
-  
+        <div className="mt-8">
+
+      <h2 className="text-lg mb-3">
+        Historique
+      </h2>
+
+      <div className="space-y-2">
+
+        {history.map((scan, index) => (
+
+          <div
+            key={index}
+            className="bg-zinc-800 border border-zinc-700 rounded-md p-3 text-sm"
+          >
+            [{scan.time}] {scan.target} → ports : {scan.ports.join(", ")}
+          </div>
+
+        ))}
+
+      </div>
+
+</div>
       </div>
   
     </div>
