@@ -14,12 +14,12 @@ Application fullstack développée avec React et FastAPI permettant d'effectuer 
 - FastAPI
 - Python
 - Pydantic
-
+- Socket TCP / DNS
 ## Fonctionnalités
 
-
-- Scan de ports réseau
-- Résolution DNS
+- Scan de ports TCP
+- Scan personnalisé de ports
+- Résolution DNS des domaines
 - Historique des scans
 - API REST avec FastAPI
 - Gestion des erreurs HTTP
@@ -33,6 +33,12 @@ L'API est développée avec FastAPI et utilise :
 - des modèles de réponse typés
 - des status HTTP adaptés
 - la résolution DNS via le module socket
+
+FastAPI génère automatiquement une documentation Swagger accessible sur :
+
+```text
+http://127.0.0.1:8000/docs
+```
 
 ## Exemple
 
