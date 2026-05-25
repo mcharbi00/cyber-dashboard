@@ -2,6 +2,7 @@ from fastapi import FastAPI,HTTPException
 from pydantic import BaseModel
 import socket
 from fastapi.middleware.cors import CORSMiddleware
+from concurrent.futures import ThreadPoolExecutor
 
 app = FastAPI()
 app.add_middleware(
@@ -34,7 +35,28 @@ COMMON_SERVICES = {
 @app.get("/")
 def root():
     return {"message": "Cyber Dashboard API"}
+def scan_port(target, port):
 
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(0.5)
+
+    try:
+
+        result = sock.connect_ex((target, port))
+
+        status = "OPEN" if result == 0 else "CLOSED"
+
+    except socket.timeout:
+
+        status = "FILTERED"
+
+    sock.close()
+
+    return {
+        "port": port,
+        "status": status,
+        "service": COMMON_SERVICES.get(port, "Unknown")
+    }
 @app.post("/scan",response_model=ScanResponse)
 def scan_ports(data: ScanRequest):
     ports_to_scan = [int(port) for port in data.ports.split(",")]
@@ -54,21 +76,15 @@ def scan_ports(data: ScanRequest):
             detail="Impossible de résoudre ce domaine"
         )
 
-    for port in ports_to_scan:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # socket .AF_INET -> désigne l'ipv4 // .SOCK_STREAM désigne le protocole TCP
-        sock.settimeout(0.5)
-        try :
-            result = sock.connect_ex((data.ip, port))
-        except socket.timeout :
-            status = "FILTERED"
-        scan_results.append({
-            "port": port,
-            "status": "OPEN" if result == 0 else "CLOSED",
-            "service": COMMON_SERVICES.get(port, "Unknown")
+    with ThreadPoolExecutor(max_workers=20) as executor:
 
-        })
+        scan_results = list(
+            executor.map(
+                lambda port: scan_port(data.ip, port),
+                ports_to_scan
+            )
+        )
 
-        sock.close()
 
     return {
         "target": data.ip,
